@@ -113,13 +113,13 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
       let isStructurePoint = false;
       let structureLabel: string | undefined;
       
-      if (swing?.type === 'HL') {
+      if (swing?.type === 'HL' && swing.low !== undefined) {
         // Hammer at swing low
         candle = createHammer(swing.low + 2, seedCounter);
         price = candle.close;
         isStructurePoint = true;
         structureLabel = 'HL';
-      } else if (swing?.type === 'HH') {
+      } else if (swing?.type === 'HH' && swing.high !== undefined) {
         // Bullish engulfing at swing high
         candle = createBullishEngulfing(price, seedCounter);
         candle.high = swing.high;
@@ -130,7 +130,7 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
       } else {
         // Regular candles moving toward next swing
         const nextSwing = swings.find(s => s.at > i);
-        const targetPrice = nextSwing ? (nextSwing.type === 'HH' ? (nextSwing.high - 3) : (nextSwing.low + 3)) : price;
+        const targetPrice = nextSwing ? (nextSwing.type === 'HH' ? ((nextSwing.high ?? price) - 3) : ((nextSwing.low ?? price) + 3)) : price;
         const step = (targetPrice - price) / (nextSwing ? nextSwing.at - i : 1);
         
         const isBullish = step > 0 ? seededRandom(seedCounter++) > 0.25 : seededRandom(seedCounter++) < 0.25;
@@ -179,13 +179,13 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
       let isStructurePoint = false;
       let structureLabel: string | undefined;
       
-      if (swing?.type === 'LH') {
+      if (swing?.type === 'LH' && swing.high !== undefined) {
         // Inverted hammer at swing high
         candle = createInvertedHammer(swing.high - 2, seedCounter);
         price = candle.close;
         isStructurePoint = true;
         structureLabel = 'LH';
-      } else if (swing?.type === 'LL') {
+      } else if (swing?.type === 'LL' && swing.low !== undefined) {
         // Bearish engulfing at swing low
         candle = createBearishEngulfing(price, seedCounter);
         candle.low = swing.low;
@@ -196,7 +196,7 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
       } else {
         // Regular candles
         const nextSwing = swings.find(s => s.at > i);
-        const targetPrice = nextSwing ? (nextSwing.type === 'LL' ? (nextSwing.low + 3) : (nextSwing.high - 3)) : price;
+        const targetPrice = nextSwing ? (nextSwing.type === 'LL' ? ((nextSwing.low ?? price) + 3) : ((nextSwing.high ?? price) - 3)) : price;
         const step = (targetPrice - price) / (nextSwing ? nextSwing.at - i : 1);
         
         const isBearish = step < 0 ? seededRandom(seedCounter++) > 0.25 : seededRandom(seedCounter++) < 0.25;
@@ -327,7 +327,7 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
       let isStructurePoint = false;
       let structureLabel: string | undefined;
       
-      if (swing?.type === 'HL') {
+      if (swing?.type === 'HL' && swing.low !== undefined) {
         // Small pullback
         const bodySize = seededRandom(seedCounter++) * 8 + 5;
         candle = {
@@ -340,7 +340,7 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
         cvdValue = candle.close;
         isStructurePoint = true;
         structureLabel = 'HL';
-      } else if (swing?.type === 'HH') {
+      } else if (swing?.type === 'HH' && swing.high !== undefined) {
         // Small breakout
         const bodySize = seededRandom(seedCounter++) * 10 + 8;
         candle = {
@@ -356,7 +356,7 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
       } else {
         // Small realistic CVD candles
         const nextSwing = swings.find(s => s.at > i);
-        const target = nextSwing ? (nextSwing.type === 'HH' ? nextSwing.high - 10 : nextSwing.low + 5) : cvdValue + 8;
+        const target = nextSwing ? (nextSwing.type === 'HH' ? (nextSwing.high ?? cvdValue) - 10 : (nextSwing.low ?? cvdValue) + 5) : cvdValue + 8;
         const step = (target - cvdValue) / (nextSwing ? nextSwing.at - i : 1);
         
         const isBullish = seededRandom(seedCounter++) > 0.35;
@@ -403,7 +403,7 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
       let isStructurePoint = false;
       let structureLabel: string | undefined;
       
-      if (swing?.type === 'LH') {
+      if (swing?.type === 'LH' && swing.high !== undefined) {
         // Small rally rejection
         const bodySize = seededRandom(seedCounter++) * 8 + 5;
         candle = {
@@ -416,7 +416,7 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
         cvdValue = candle.close;
         isStructurePoint = true;
         structureLabel = 'LH';
-      } else if (swing?.type === 'LL') {
+      } else if (swing?.type === 'LL' && swing.low !== undefined) {
         // Small breakdown
         const bodySize = seededRandom(seedCounter++) * 10 + 8;
         candle = {
@@ -432,7 +432,7 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
       } else {
         // Small realistic CVD candles
         const nextSwing = swings.find(s => s.at > i);
-        const target = nextSwing ? (nextSwing.type === 'LL' ? nextSwing.low + 10 : nextSwing.high - 5) : cvdValue - 8;
+        const target = nextSwing ? (nextSwing.type === 'LL' ? (nextSwing.low ?? cvdValue) + 10 : (nextSwing.high ?? cvdValue) - 5) : cvdValue - 8;
         const step = (target - cvdValue) / (nextSwing ? nextSwing.at - i : 1);
         
         const isBearish = seededRandom(seedCounter++) > 0.35;
