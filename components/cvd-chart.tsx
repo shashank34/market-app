@@ -7,9 +7,10 @@ import { CVDData } from '@/lib/cvd-scenarios';
 interface CVDChartProps {
   data: CVDData[];
   color: 'green' | 'red' | 'orange';
+  entryTime?: number;
 }
 
-export function CVDChart({ data, color }: CVDChartProps) {
+export function CVDChart({ data, color, entryTime }: CVDChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,6 +27,10 @@ export function CVDChart({ data, color }: CVDChartProps) {
       },
       width: chartContainerRef.current.clientWidth,
       height: 180,
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+      },
     });
 
     const candlestickSeries = chart.addSeries(CandlestickSeries, {
@@ -48,15 +53,64 @@ export function CVDChart({ data, color }: CVDChartProps) {
 
     candlestickSeries.setData(chartData);
 
-    // Add markers for patterns and structure points (no text labels)
+    // Add horizontal lines for key swing points
+    const structurePoints = data.filter(candle => candle.isStructurePoint);
+    structurePoints.forEach((point, index) => {
+      const isHigh = point.structureLabel?.includes('H') && !point.structureLabel?.includes('L');
+      const priceLevel = isHigh ? point.high : point.low;
+      
+      candlestickSeries.createPriceLine({
+        price: priceLevel,
+        color: '#a855f7',
+        lineWidth: 1,
+        lineStyle: 1, // Dotted
+        axisLabelVisible: true,
+        title: '',
+      });
+    });
+
+    // Highlight the previous structure level that triggers entry
+    if (entryTime !== undefined && entryTime > 0) {
+      // Find the key structure point before entry
+      const relevantStructure = structurePoints.filter(p => {
+        const pIndex = data.indexOf(p);
+        return pIndex < entryTime && pIndex > entryTime - 20;
+      }).pop();
+      
+      if (relevantStructure) {
+        const isHigh = relevantStructure.structureLabel?.includes('H');
+        const triggerLevel = isHigh ? relevantStructure.high : relevantStructure.low;
+        
+        candlestickSeries.createPriceLine({
+          price: triggerLevel,
+          color: '#fb923c',
+          lineWidth: 2,
+          lineStyle: 0, // Solid
+          axisLabelVisible: true,
+          title: 'BREAKOUT',
+        });
+      }
+    }
+
+    // Add markers for patterns and structure points
     const markers = data
-      .filter((candle) => candle.pattern || candle.isStructurePoint)
+      .filter((candle) => candle.isStructurePoint)
       .map((candle) => ({
         time: candle.time as Time,
-        position: (candle.pattern ? 'aboveBar' : 'belowBar') as any,
-        color: candle.pattern ? '#fbbf24' : '#a855f7',
+        position: 'belowBar' as any,
+        color: '#a855f7',
         shape: 'circle' as any,
       }));
+    
+    // Add entry marker if entryTime is provided
+    if (entryTime !== undefined && entryTime >= 0 && entryTime < data.length) {
+      markers.push({
+        time: data[entryTime].time as Time,
+        position: 'belowBar' as any,
+        color: '#3b82f6',
+        shape: 'arrowUp' as any,
+      });
+    }
     
     // v5 API: Create markers primitive instead of calling setMarkers on series
     createSeriesMarkers(candlestickSeries, markers);
@@ -75,7 +129,7 @@ export function CVDChart({ data, color }: CVDChartProps) {
       window.removeEventListener('resize', handleResize);
       chart.remove();
     };
-  }, [data]);
+  }, [data, entryTime]);
 
   return (
     <div className="relative">

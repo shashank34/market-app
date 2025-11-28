@@ -27,6 +27,10 @@ export function CandlestickChart({ data, tradeSetup, color }: CandlestickChartPr
       },
       width: chartContainerRef.current.clientWidth,
       height: 250,
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+      },
     });
 
     const candlestickSeries = chart.addSeries(CandlestickSeries, {
@@ -79,15 +83,25 @@ export function CandlestickChart({ data, tradeSetup, color }: CandlestickChartPr
       });
     }
 
-    // Add markers for patterns and structure points (no text labels)
+    // Add markers for structure points only
     const markers = data
-      .filter((candle) => candle.pattern || candle.isStructurePoint)
+      .filter((candle) => candle.isStructurePoint)
       .map((candle) => ({
         time: candle.time as Time,
-        position: (candle.pattern ? 'aboveBar' : 'belowBar') as any,
-        color: candle.pattern ? '#fbbf24' : '#a855f7',
+        position: 'belowBar' as any,
+        color: '#a855f7',
         shape: 'circle' as any,
       }));
+    
+    // Add entry marker if trade setup exists
+    if (tradeSetup.entry > 0 && tradeSetup.entryTime >= 0 && tradeSetup.entryTime < data.length) {
+      markers.push({
+        time: data[tradeSetup.entryTime].time as Time,
+        position: 'belowBar' as any,
+        color: '#3b82f6',
+        shape: 'arrowUp' as any,
+      });
+    }
     
     // v5 API: Create markers primitive instead of calling setMarkers on series
     createSeriesMarkers(candlestickSeries, markers);

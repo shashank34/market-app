@@ -96,18 +96,20 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
   let seedCounter = seed;
   
   if (pattern === 'uptrend') {
-    // UPTREND: Clear Higher Highs and Higher Lows
-    let price = 95;
+    // UPTREND: Simple round numbers for teaching
+    let price = 100;
     const swings = [
-      { type: 'HL', at: 3, low: 95 },
-      { type: 'HH', at: 7, high: 108 },
-      { type: 'HL', at: 11, low: 102 },
-      { type: 'HH', at: 15, high: 118 },
-      { type: 'HL', at: 19, low: 112 },
-      { type: 'HH', at: 23, high: 128 }
+      { type: 'HL', at: 8, low: 102 },
+      { type: 'HH', at: 18, high: 115 },
+      { type: 'HL', at: 28, low: 110 },
+      { type: 'HH', at: 38, high: 125 },
+      { type: 'HL', at: 50, low: 120 },
+      { type: 'HH', at: 62, high: 135 },
+      { type: 'HL', at: 68, low: 130 },
+      { type: 'HH', at: 74, high: 145 }
     ];
     
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 75; i++) {
       const swing = swings.find(s => s.at === i);
       let candle: any;
       let isStructurePoint = false;
@@ -135,22 +137,24 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
         
         const isBullish = step > 0 ? seededRandom(seedCounter++) > 0.25 : seededRandom(seedCounter++) < 0.25;
         const open = price;
-        const bodySize = Math.abs(step) * seededRandom(seedCounter++) * 2 + 1.2; // Bigger bodies
+        const bodySize = seededRandom(seedCounter++) * 3 + 1.5;
         const close = isBullish ? open + bodySize : open - bodySize * 0.4;
         
         candle = {
           open,
           close,
-          high: Math.max(open, close) + seededRandom(seedCounter++) * 1.5 + 0.5,
-          low: Math.min(open, close) - seededRandom(seedCounter++) * 1.2 - 0.4,
+          high: Math.max(open, close) + seededRandom(seedCounter++) * 2 + 0.8,
+          low: Math.min(open, close) - seededRandom(seedCounter++) * 1.5 - 0.8,
           pattern: undefined
         };
         price = close;
       }
       
       seedCounter += 10;
+      // Each candle is 5 minutes apart, starting from a base time (9:15 AM)
+      const baseTime = new Date('2024-01-01T09:15:00').getTime() / 1000;
       data.push({
-        time: i,
+        time: baseTime + (i * 5 * 60), // 5 minutes in seconds
         open: parseFloat(candle.open.toFixed(2)),
         high: parseFloat(candle.high.toFixed(2)),
         low: parseFloat(candle.low.toFixed(2)),
@@ -162,18 +166,18 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
       });
     }
   } else if (pattern === 'downtrend') {
-    // DOWNTREND: Clear Lower Highs and Lower Lows
-    let price = 100;
+    // DOWNTREND: Simple round numbers for teaching
+    let price = 150;
     const swings = [
-      { type: 'LH', at: 3, high: 100 },
-      { type: 'LL', at: 7, low: 88 },
-      { type: 'LH', at: 11, high: 94 },
-      { type: 'LL', at: 15, low: 78 },
-      { type: 'LH', at: 19, high: 84 },
-      { type: 'LL', at: 23, low: 70 }
+      { type: 'LH', at: 10, high: 148 },
+      { type: 'LL', at: 22, low: 130 },
+      { type: 'LH', at: 35, high: 138 },
+      { type: 'LL', at: 48, low: 115 },
+      { type: 'LH', at: 58, high: 125 },
+      { type: 'LL', at: 70, low: 100 }
     ];
     
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 75; i++) {
       const swing = swings.find(s => s.at === i);
       let candle: any;
       let isStructurePoint = false;
@@ -201,22 +205,24 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
         
         const isBearish = step < 0 ? seededRandom(seedCounter++) > 0.25 : seededRandom(seedCounter++) < 0.25;
         const open = price;
-        const bodySize = Math.abs(step) * seededRandom(seedCounter++) * 2 + 1.2; // Bigger bodies
+        const bodySize = seededRandom(seedCounter++) * 3 + 1.5;
         const close = isBearish ? open - bodySize : open + bodySize * 0.4;
         
         candle = {
           open,
           close,
-          high: Math.max(open, close) + seededRandom(seedCounter++) * 1.2 + 0.4,
-          low: Math.min(open, close) - seededRandom(seedCounter++) * 1.5 - 0.5,
+          high: Math.max(open, close) + seededRandom(seedCounter++) * 1.5 + 0.8,
+          low: Math.min(open, close) - seededRandom(seedCounter++) * 2 + 0.8,
           pattern: undefined
         };
         price = close;
       }
       
       seedCounter += 10;
+      // Each candle is 5 minutes apart, starting from a base time (9:15 AM)
+      const baseTime = new Date('2024-01-01T09:15:00').getTime() / 1000;
       data.push({
-        time: i,
+        time: baseTime + (i * 5 * 60), // 5 minutes in seconds
         open: parseFloat(candle.open.toFixed(2)),
         high: parseFloat(candle.high.toFixed(2)),
         low: parseFloat(candle.low.toFixed(2)),
@@ -228,40 +234,40 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
       });
     }
   } else {
-    // SIDEWAYS: Range-bound with clear support/resistance and continuous flow
-    const rangeHigh = 105;
-    const rangeLow = 95;
-    const rangeMid = 100;
+    // SIDEWAYS: Range-bound with clear support/resistance
+    const rangeHigh = 120;
+    const rangeLow = 100;
+    const rangeMid = 110;
     let price = rangeMid;
     
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 75; i++) {
       let candle: any;
       let isStructurePoint = false;
       let structureLabel: string | undefined;
       
       // Bounce at support
-      if (i === 5 || i === 13 || i === 21) {
-        candle = createHammer(rangeLow + 1, seedCounter);
+      if (i === 12 || i === 28 || i === 45 || i === 62) {
+        candle = createHammer(rangeLow + 2, seedCounter);
         candle.low = rangeLow;
-        candle.close = rangeLow + 2;
+        candle.close = rangeLow + 3;
         price = candle.close;
         isStructurePoint = true;
         structureLabel = 'Support';
       }
       // Rejection at resistance
-      else if (i === 9 || i === 17) {
-        candle = createInvertedHammer(rangeHigh - 1, seedCounter);
+      else if (i === 20 || i === 38 || i === 55 || i === 70) {
+        candle = createInvertedHammer(rangeHigh - 2, seedCounter);
         candle.high = rangeHigh;
-        candle.close = rangeHigh - 2;
+        candle.close = rangeHigh - 3;
         price = candle.close;
         isStructurePoint = true;
         structureLabel = 'Resistance';
       }
       // Doji at mid-range
-      else if (i === 3 || i === 11 || i === 19) {
+      else if (i === 8 || i === 25 || i === 42 || i === 58) {
         candle = createDoji(price, seedCounter);
         candle.open = price;
-        candle.close = price + (seededRandom(seedCounter) - 0.5) * 0.5;
+        candle.close = price + (seededRandom(seedCounter) - 0.5) * 5;
         price = candle.close;
       }
       // Regular candles oscillating - flow from previous close
@@ -271,25 +277,27 @@ function generatePriceData(pattern: 'uptrend' | 'downtrend' | 'sideways', seed: 
         const distToLow = price - rangeLow;
         const goingUp = distToLow < distToHigh ? seededRandom(seedCounter++) > 0.3 : seededRandom(seedCounter++) < 0.3;
         
-        const bodySize = seededRandom(seedCounter++) * 1.8 + 0.8;
+        const bodySize = seededRandom(seedCounter++) * 3 + 1.5;
         const open = price;
         const close = goingUp ? 
-          Math.min(rangeHigh - 0.5, open + bodySize) : 
-          Math.max(rangeLow + 0.5, open - bodySize);
+          Math.min(rangeHigh - 1, open + bodySize) : 
+          Math.max(rangeLow + 1, open - bodySize);
         
         candle = {
           open,
           close,
-          high: Math.min(rangeHigh, Math.max(open, close) + seededRandom(seedCounter++) * 1.5 + 0.5),
-          low: Math.max(rangeLow, Math.min(open, close) - seededRandom(seedCounter++) * 1.5 - 0.5),
+          high: Math.min(rangeHigh, Math.max(open, close) + seededRandom(seedCounter++) * 2 + 1),
+          low: Math.max(rangeLow, Math.min(open, close) - seededRandom(seedCounter++) * 2 - 1),
           pattern: undefined
         };
         price = close;
       }
       
       seedCounter += 10;
+      // Each candle is 5 minutes apart, starting from a base time (9:15 AM)
+      const baseTime = new Date('2024-01-01T09:15:00').getTime() / 1000;
       data.push({
-        time: i,
+        time: baseTime + (i * 5 * 60), // 5 minutes in seconds
         open: parseFloat(candle.open.toFixed(2)),
         high: parseFloat(candle.high.toFixed(2)),
         low: parseFloat(candle.low.toFixed(2)),
@@ -311,29 +319,29 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
   let seedCounter = seed;
   
   if (pattern === 'up') {
-    // CVD UPTREND: Gradual accumulation with realistic small candles
-    let cvdValue = -50;
+    // CVD UPTREND: Simple numbers for teaching
+    let cvdValue = -20;
     const swings = [
-      { type: 'HL', at: 5, low: -30 },
-      { type: 'HH', at: 10, high: 80 },
-      { type: 'HL', at: 15, low: 50 },
-      { type: 'HH', at: 20, high: 150 },
-      { type: 'HL', at: 23, low: 120 }
+      { type: 'HL', at: 15, low: 0 },
+      { type: 'HH', at: 28, high: 40 },
+      { type: 'HL', at: 42, low: 25 },
+      { type: 'HH', at: 55, high: 70 },
+      { type: 'HL', at: 65, low: 55 },
+      { type: 'HH', at: 74, high: 95 }
     ];
     
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 75; i++) {
       const swing = swings.find(s => s.at === i);
       let candle: any;
       let isStructurePoint = false;
       let structureLabel: string | undefined;
       
       if (swing?.type === 'HL' && swing.low !== undefined) {
-        // Small pullback
-        const bodySize = seededRandom(seedCounter++) * 8 + 5;
+        // Pullback
         candle = {
           open: cvdValue,
-          close: swing.low + 3,
-          high: cvdValue + seededRandom(seedCounter++) * 6 + 2,
+          close: swing.low + 2,
+          high: cvdValue + seededRandom(seedCounter++) * 4 + 2,
           low: swing.low,
           pattern: 'Hammer'
         };
@@ -341,26 +349,25 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
         isStructurePoint = true;
         structureLabel = 'HL';
       } else if (swing?.type === 'HH' && swing.high !== undefined) {
-        // Small breakout
-        const bodySize = seededRandom(seedCounter++) * 10 + 8;
+        // Breakout
         candle = {
           open: cvdValue,
-          close: swing.high - 2,
+          close: swing.high - 1,
           high: swing.high,
-          low: cvdValue - seededRandom(seedCounter++) * 5 - 2,
+          low: cvdValue - seededRandom(seedCounter++) * 3 - 1,
           pattern: undefined
         };
         cvdValue = candle.close;
         isStructurePoint = true;
         structureLabel = 'HH';
       } else {
-        // Small realistic CVD candles
+        // Simple CVD candles
         const nextSwing = swings.find(s => s.at > i);
-        const target = nextSwing ? (nextSwing.type === 'HH' ? (nextSwing.high ?? cvdValue) - 10 : (nextSwing.low ?? cvdValue) + 5) : cvdValue + 8;
+        const target = nextSwing ? (nextSwing.type === 'HH' ? (nextSwing.high ?? cvdValue) - 5 : (nextSwing.low ?? cvdValue) + 3) : cvdValue + 2;
         const step = (target - cvdValue) / (nextSwing ? nextSwing.at - i : 1);
         
         const isBullish = seededRandom(seedCounter++) > 0.35;
-        const bodySize = seededRandom(seedCounter++) * 12 + 4;
+        const bodySize = seededRandom(seedCounter++) * 5 + 2;
         
         candle = {
           open: cvdValue,
@@ -369,14 +376,16 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
           low: 0,
           pattern: undefined
         };
-        candle.high = Math.max(candle.open, candle.close) + seededRandom(seedCounter++) * 8 + 2;
-        candle.low = Math.min(candle.open, candle.close) - seededRandom(seedCounter++) * 8 - 2;
+        candle.high = Math.max(candle.open, candle.close) + seededRandom(seedCounter++) * 4 + 1;
+        candle.low = Math.min(candle.open, candle.close) - seededRandom(seedCounter++) * 3 - 1;
         cvdValue = candle.close;
       }
       
       seedCounter += 10;
+      // Each candle is 5 minutes apart, starting from a base time (9:15 AM)
+      const baseTime = new Date('2024-01-01T09:15:00').getTime() / 1000;
       data.push({
-        time: i,
+        time: baseTime + (i * 5 * 60), // 5 minutes in seconds
         open: parseFloat(candle.open.toFixed(2)),
         high: parseFloat(candle.high.toFixed(2)),
         low: parseFloat(candle.low.toFixed(2)),
@@ -387,42 +396,41 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
       });
     }
   } else if (pattern === 'down') {
-    // CVD DOWNTREND: Gradual distribution with realistic small candles
-    let cvdValue = 50;
+    // CVD DOWNTREND: Simple numbers for teaching
+    let cvdValue = 20;
     const swings = [
-      { type: 'LH', at: 5, high: 30 },
-      { type: 'LL', at: 10, low: -80 },
-      { type: 'LH', at: 15, high: -50 },
-      { type: 'LL', at: 20, low: -150 },
-      { type: 'LH', at: 23, high: -120 }
+      { type: 'LH', at: 15, high: 10 },
+      { type: 'LL', at: 28, low: -30 },
+      { type: 'LH', at: 42, high: -15 },
+      { type: 'LL', at: 55, low: -60 },
+      { type: 'LH', at: 65, high: -50 },
+      { type: 'LL', at: 74, low: -85 }
     ];
     
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 75; i++) {
       const swing = swings.find(s => s.at === i);
       let candle: any;
       let isStructurePoint = false;
       let structureLabel: string | undefined;
       
       if (swing?.type === 'LH' && swing.high !== undefined) {
-        // Small rally rejection
-        const bodySize = seededRandom(seedCounter++) * 8 + 5;
+        // Rally rejection
         candle = {
           open: cvdValue,
-          close: swing.high - 3,
+          close: swing.high - 2,
           high: swing.high,
-          low: cvdValue - seededRandom(seedCounter++) * 6 - 2,
+          low: cvdValue - seededRandom(seedCounter++) * 4 - 2,
           pattern: 'Inverted Hammer'
         };
         cvdValue = candle.close;
         isStructurePoint = true;
         structureLabel = 'LH';
       } else if (swing?.type === 'LL' && swing.low !== undefined) {
-        // Small breakdown
-        const bodySize = seededRandom(seedCounter++) * 10 + 8;
+        // Breakdown
         candle = {
           open: cvdValue,
-          close: swing.low + 2,
-          high: cvdValue + seededRandom(seedCounter++) * 5 + 2,
+          close: swing.low + 1,
+          high: cvdValue + seededRandom(seedCounter++) * 3 + 1,
           low: swing.low,
           pattern: undefined
         };
@@ -430,13 +438,13 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
         isStructurePoint = true;
         structureLabel = 'LL';
       } else {
-        // Small realistic CVD candles
+        // Simple CVD candles
         const nextSwing = swings.find(s => s.at > i);
-        const target = nextSwing ? (nextSwing.type === 'LL' ? (nextSwing.low ?? cvdValue) + 10 : (nextSwing.high ?? cvdValue) - 5) : cvdValue - 8;
+        const target = nextSwing ? (nextSwing.type === 'LL' ? (nextSwing.low ?? cvdValue) + 5 : (nextSwing.high ?? cvdValue) - 3) : cvdValue - 2;
         const step = (target - cvdValue) / (nextSwing ? nextSwing.at - i : 1);
         
         const isBearish = seededRandom(seedCounter++) > 0.35;
-        const bodySize = seededRandom(seedCounter++) * 12 + 4;
+        const bodySize = seededRandom(seedCounter++) * 5 + 2;
         
         candle = {
           open: cvdValue,
@@ -445,14 +453,16 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
           low: 0,
           pattern: undefined
         };
-        candle.high = Math.max(candle.open, candle.close) + seededRandom(seedCounter++) * 8 + 2;
-        candle.low = Math.min(candle.open, candle.close) - seededRandom(seedCounter++) * 8 - 2;
+        candle.high = Math.max(candle.open, candle.close) + seededRandom(seedCounter++) * 3 + 1;
+        candle.low = Math.min(candle.open, candle.close) - seededRandom(seedCounter++) * 4 - 1;
         cvdValue = candle.close;
       }
       
       seedCounter += 10;
+      // Each candle is 5 minutes apart, starting from a base time (9:15 AM)
+      const baseTime = new Date('2024-01-01T09:15:00').getTime() / 1000;
       data.push({
-        time: i,
+        time: baseTime + (i * 5 * 60), // 5 minutes in seconds
         open: parseFloat(candle.open.toFixed(2)),
         high: parseFloat(candle.high.toFixed(2)),
         low: parseFloat(candle.low.toFixed(2)),
@@ -463,19 +473,19 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
       });
     }
   } else {
-    // CVD SIDEWAYS: Small choppy oscillations around zero with continuous flow
+    // CVD SIDEWAYS: Choppy oscillations (no clear direction)
     let cvdValue = 0;
-    const rangeHigh = 40;
-    const rangeLow = -40;
+    const rangeHigh = 30;
+    const rangeLow = -30;
     
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 75; i++) {
       let candle: any;
       let isStructurePoint = false;
       let structureLabel: string | undefined;
       
-      // Realistic small oscillating candles
-      if (i % 9 === 0) {
-        // Small doji
+      // Oscillating candles
+      if (i % 18 === 0) {
+        // Doji
         candle = {
           open: cvdValue,
           close: cvdValue + (seededRandom(seedCounter) - 0.5) * 2,
@@ -483,26 +493,26 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
           low: 0,
           pattern: 'Doji'
         };
-        candle.high = Math.max(candle.open, candle.close) + seededRandom(seedCounter + 1) * 8 + 3;
-        candle.low = Math.min(candle.open, candle.close) - seededRandom(seedCounter + 2) * 8 - 3;
+        candle.high = Math.max(candle.open, candle.close) + seededRandom(seedCounter + 1) * 4 + 2;
+        candle.low = Math.min(candle.open, candle.close) - seededRandom(seedCounter + 2) * 4 - 2;
         cvdValue = candle.close;
-      } else if (i % 13 === 0) {
-        // Small hammer
+      } else if (i % 25 === 0) {
+        // Hammer
         candle = {
           open: cvdValue,
-          close: cvdValue + 4,
-          high: cvdValue + 7,
-          low: cvdValue - 12,
+          close: cvdValue + 3,
+          high: cvdValue + 5,
+          low: cvdValue - 7,
           pattern: 'Hammer'
         };
         cvdValue = candle.close;
       } else {
-        // Keep values within range and flow from previous
+        // Keep values within range
         const distToHigh = rangeHigh - cvdValue;
         const distToLow = cvdValue - rangeLow;
         const goingUp = distToLow < distToHigh ? seededRandom(seedCounter++) > 0.4 : seededRandom(seedCounter++) < 0.4;
         
-        const bodySize = seededRandom(seedCounter++) * 7 + 3;
+        const bodySize = seededRandom(seedCounter++) * 4 + 2;
         
         candle = {
           open: cvdValue,
@@ -513,14 +523,16 @@ function generateCVDData(pattern: 'up' | 'down' | 'sideways', seed: number): CVD
           low: 0,
           pattern: undefined
         };
-        candle.high = Math.max(candle.open, candle.close) + seededRandom(seedCounter++) * 6 + 2;
-        candle.low = Math.min(candle.open, candle.close) - seededRandom(seedCounter++) * 6 - 2;
+        candle.high = Math.max(candle.open, candle.close) + seededRandom(seedCounter++) * 3 + 1;
+        candle.low = Math.min(candle.open, candle.close) - seededRandom(seedCounter++) * 3 - 1;
         cvdValue = candle.close;
       }
       
       seedCounter += 10;
+      // Each candle is 5 minutes apart, starting from a base time (9:15 AM)
+      const baseTime = new Date('2024-01-01T09:15:00').getTime() / 1000;
       data.push({
-        time: i,
+        time: baseTime + (i * 5 * 60), // 5 minutes in seconds
         open: parseFloat(candle.open.toFixed(2)),
         high: parseFloat(candle.high.toFixed(2)),
         low: parseFloat(candle.low.toFixed(2)),
@@ -550,10 +562,10 @@ const scenario1: Scenario = {
   priceData: scenario1PriceData,
   cvdData: scenario1CVDData,
   tradeSetup: {
-    entry: scenario1PriceData[15].close,
-    target: scenario1PriceData[15].close * 1.06,
-    stopLoss: scenario1PriceData[15].close * 0.98,
-    entryTime: 15,
+    entry: scenario1PriceData[38].close,
+    target: scenario1PriceData[38].close * 1.015,
+    stopLoss: scenario1PriceData[38].close * 0.997,
+    entryTime: 38,
     riskReward: '1:3'
   }
 };
@@ -573,10 +585,10 @@ const scenario2: Scenario = {
   priceData: scenario2PriceData,
   cvdData: scenario2CVDData,
   tradeSetup: {
-    entry: scenario2PriceData[15].close,
-    target: scenario2PriceData[15].close * 0.94,
-    stopLoss: scenario2PriceData[15].close * 1.02,
-    entryTime: 15,
+    entry: scenario2PriceData[62].close,
+    target: scenario2PriceData[62].close * 0.985,
+    stopLoss: scenario2PriceData[62].close * 1.005,
+    entryTime: 62,
     riskReward: '1:3'
   }
 };
@@ -596,10 +608,10 @@ const scenario3: Scenario = {
   priceData: scenario3PriceData,
   cvdData: scenario3CVDData,
   tradeSetup: {
-    entry: scenario3PriceData[15].close,
-    target: scenario3PriceData[15].close * 1.03,
-    stopLoss: scenario3PriceData[15].close * 0.99,
-    entryTime: 15,
+    entry: scenario3PriceData[50].close,
+    target: scenario3PriceData[50].close * 1.008,
+    stopLoss: scenario3PriceData[50].close * 0.997,
+    entryTime: 50,
     riskReward: '1:1.5'
   }
 };
@@ -619,10 +631,10 @@ const scenario4: Scenario = {
   priceData: scenario4PriceData,
   cvdData: scenario4CVDData,
   tradeSetup: {
-    entry: scenario4PriceData[15].close,
-    target: scenario4PriceData[15].close * 1.07,
-    stopLoss: scenario4PriceData[15].close * 0.97,
-    entryTime: 15,
+    entry: scenario4PriceData[48].close,
+    target: scenario4PriceData[48].close * 1.018,
+    stopLoss: scenario4PriceData[48].close * 0.995,
+    entryTime: 48,
     riskReward: '1:3.5'
   }
 };
@@ -642,10 +654,10 @@ const scenario5: Scenario = {
   priceData: scenario5PriceData,
   cvdData: scenario5CVDData,
   tradeSetup: {
-    entry: scenario5PriceData[15].close,
-    target: scenario5PriceData[15].close * 0.93,
-    stopLoss: scenario5PriceData[15].close * 1.02,
-    entryTime: 15,
+    entry: scenario5PriceData[48].close,
+    target: scenario5PriceData[48].close * 0.982,
+    stopLoss: scenario5PriceData[48].close * 1.005,
+    entryTime: 48,
     riskReward: '1:3.5'
   }
 };
@@ -665,10 +677,10 @@ const scenario6: Scenario = {
   priceData: scenario6PriceData,
   cvdData: scenario6CVDData,
   tradeSetup: {
-    entry: scenario6PriceData[15].close,
-    target: scenario6PriceData[15].close * 0.97,
-    stopLoss: scenario6PriceData[15].close * 1.01,
-    entryTime: 15,
+    entry: scenario6PriceData[48].close,
+    target: scenario6PriceData[48].close * 0.992,
+    stopLoss: scenario6PriceData[48].close * 1.003,
+    entryTime: 48,
     riskReward: '1:1.5'
   }
 };
@@ -688,10 +700,10 @@ const scenario7: Scenario = {
   priceData: scenario7PriceData,
   cvdData: scenario7CVDData,
   tradeSetup: {
-    entry: Math.max(...scenario7PriceData.slice(10).map(c => c.high)) + 0.5,
-    target: (Math.max(...scenario7PriceData.slice(10).map(c => c.high)) + 0.5) * 1.05,
-    stopLoss: Math.min(...scenario7PriceData.slice(10).map(c => c.low)) - 0.5,
-    entryTime: 16,
+    entry: Math.max(...scenario7PriceData.slice(30).map(c => c.high)) + 5,
+    target: (Math.max(...scenario7PriceData.slice(30).map(c => c.high)) + 5) * 1.012,
+    stopLoss: Math.min(...scenario7PriceData.slice(30).map(c => c.low)) - 5,
+    entryTime: 55,
     riskReward: '1:2.5'
   }
 };
@@ -711,10 +723,10 @@ const scenario8: Scenario = {
   priceData: scenario8PriceData,
   cvdData: scenario8CVDData,
   tradeSetup: {
-    entry: Math.min(...scenario8PriceData.slice(10).map(c => c.low)) - 0.5,
-    target: (Math.min(...scenario8PriceData.slice(10).map(c => c.low)) - 0.5) * 0.95,
-    stopLoss: Math.max(...scenario8PriceData.slice(10).map(c => c.high)) + 0.5,
-    entryTime: 16,
+    entry: Math.min(...scenario8PriceData.slice(30).map(c => c.low)) - 5,
+    target: (Math.min(...scenario8PriceData.slice(30).map(c => c.low)) - 5) * 0.988,
+    stopLoss: Math.max(...scenario8PriceData.slice(30).map(c => c.high)) + 5,
+    entryTime: 55,
     riskReward: '1:2.5'
   }
 };
