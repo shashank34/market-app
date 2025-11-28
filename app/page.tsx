@@ -1,65 +1,92 @@
-import Image from "next/image";
+'use client';
+
+import { CVDScenarioGrid } from '@/components/cvd-scenario-grid';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+      <div className="max-w-[1800px] mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            CVD Trading Strategy
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-slate-400 text-lg mb-6">
+            Complete Guide to Cumulative Volume Delta (CVD) Trading with Exact Entry, Target & Stop Loss
           </p>
+          
+          <div className="flex flex-wrap justify-center gap-4 text-sm mb-6">
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-4 py-2">
+              <span className="text-green-400 font-semibold">🟢 CVD UP = Bullish</span>
+            </div>
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2">
+              <span className="text-red-400 font-semibold">🔴 CVD DOWN = Bearish</span>
+            </div>
+            <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg px-4 py-2">
+              <span className="text-orange-400 font-semibold">⚠️ CVD SIDEWAYS = Weak/Wait</span>
+            </div>
+          </div>
+          
+          {/* Chart Legend */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 max-w-4xl mx-auto mb-6">
+            <h3 className="text-sm font-bold text-white mb-3">📊 How to Read the Charts:</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div className="flex items-start gap-2">
+                <span className="text-yellow-400 text-lg">⭐</span>
+                <div>
+                  <p className="text-white font-semibold">Star = Candlestick Pattern</p>
+                  <p className="text-slate-400">Shows Hammer, Engulfing, Doji patterns</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-purple-400 text-lg">●</span>
+                <div>
+                  <p className="text-white font-semibold">Purple Dot = Market Structure</p>
+                  <p className="text-slate-400">HH (Higher High), HL (Higher Low), LH (Lower High), LL (Lower Low)</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-blue-400 text-lg">▬</span>
+                <div>
+                  <p className="text-white font-semibold">Blue Line = Entry Point</p>
+                  <p className="text-slate-400">Where to enter the trade</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-400 text-lg">▬</span>
+                <div>
+                  <p className="text-white font-semibold">Green Line = Target</p>
+                  <p className="text-slate-400">Where to take profit</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-red-400 text-lg">▬</span>
+                <div>
+                  <p className="text-white font-semibold">Red Line = Stop Loss</p>
+                  <p className="text-slate-400">Where to exit if wrong</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-slate-400 text-lg">🔵</span>
+                <div>
+                  <p className="text-white font-semibold">Blue Dot = Exact Entry Time</p>
+                  <p className="text-slate-400">The exact candle to enter</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <p className="text-blue-300 font-bold text-sm mb-2">💡 ENTRY TIMING RULE (Most Important!):</p>
+              <ul className="text-slate-300 text-xs space-y-1 list-disc list-inside">
+                <li><strong>For BUY:</strong> Enter when CVD breaks its previous High (HH) OR when price breaks above range</li>
+                <li><strong>For SELL:</strong> Enter when CVD breaks its previous Low (LL) OR when price breaks below range</li>
+                <li><strong>For WAIT:</strong> Do nothing until you see clear structure break on BOTH charts</li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        <CVDScenarioGrid />
+      </div>
+    </main>
   );
 }
